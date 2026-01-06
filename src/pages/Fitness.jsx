@@ -51,7 +51,7 @@ useEffect(() => {
   // LOAD DAILY FITNESS DATA
   // -------------------------------------------------------------
   useEffect(() => {
-    if (!user) return;
+    if (!user) return <div>Loading user...</div>;
 
     const ref = doc(db, "fitnessDaily", `${user.uid}_${todayDate}`);
 
@@ -72,7 +72,7 @@ useEffect(() => {
   // LOAD WORKOUT LOGS
   // -------------------------------------------------------------
   useEffect(() => {
-    if (!user) return;
+    if (!user) return <div>Loading user...</div>;
 
     const q = query(
       collection(db, "workouts"),
@@ -157,8 +157,9 @@ useEffect(() => {
     goals: [8000, 8000, 8000, 8000, 8000, 8000, 8000],
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <div>Loading data...</div>;
 
+<h1 style={{ color: "red" }}>Dashboard Loaded</h1>
 
   return (
     <div className="fitness-container">

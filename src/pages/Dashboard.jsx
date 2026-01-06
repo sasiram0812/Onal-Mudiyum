@@ -22,7 +22,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
   const fetchData = async () => {
-    if (!user) return;
+    if (!user) return <div>Loading user...</div>;
 
     await loadProfile();
     await loadTasks();
@@ -144,7 +144,7 @@ function Dashboard() {
 
   // ---------------- INITIAL LOAD ----------------
   useEffect(() => {
-    if (!user) return;
+    if (!user) return <div>Loading user...</div>;
     loadProfile();
     loadTasks();
     loadStudy();
@@ -153,9 +153,11 @@ function Dashboard() {
   
 
 
-if (loading) return <Loader />;
+if (loading) return <div>Loading data...</div>;
+<h1 style={{ color: "red" }}>Dashboard Loaded</h1>
 
   return (
+    
     <div className="dashboard-container">
       <Navbar />
 
