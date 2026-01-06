@@ -1,24 +1,19 @@
-import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { auth } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import Loader from "./Loader";
 
-function ProtectedRoute({ children }) {
-  const [loading, setLoading] = useState(true);
-  const [loggedIn, setLoggedIn] = useState(false);
+const ProtectedRoute = ({ children }) => {
+  const { user, authLoading } = useAuth();
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setLoggedIn(!!user);
-      setLoading(false);
-    });
+  if (authLoading) {
+    return <Loader />; // 🔥 WAIT FOR AUTH
+  }
 
-    return () => unsubscribe();
-  }, []);
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
-  if (loading) return <Loader />;  // 🔥 Show loader on refresh
-
-  return loggedIn ? children : <Navigate to="/login" />;
-}
+  return children;
+};
 
 export default ProtectedRoute;

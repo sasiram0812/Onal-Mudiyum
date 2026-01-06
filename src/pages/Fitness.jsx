@@ -9,7 +9,6 @@ import {
   collection,
   addDoc,
   setDoc,
-  updateDoc,
   onSnapshot,
   doc,
   query,

@@ -3,13 +3,13 @@ import Navbar from "../components/Navbar";
 import "./Dashboard.css";
 import StudyChart from "../components/StudyChart";
 
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import Loader from "../components/Loader";
-
+import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
-  const user = auth.currentUser;
+  const { user } = useAuth();
 
   // ---------------- STATE ----------------
   const [username, setUsername] = useState("User");
