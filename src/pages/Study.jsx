@@ -74,7 +74,7 @@ useEffect(() => {
 
   // ---------------------- LOAD SUBJECTS ----------------------
   useEffect(() => {
-    if (!user) return <div>Loading user...</div>;
+     if (!user) return;
 
     const q = query(
       collection(db, "subjects"),
@@ -95,7 +95,7 @@ useEffect(() => {
 
   // ---------------------- LOAD SESSIONS ----------------------
   useEffect(() => {
-    if (!user) return <div>Loading user...</div>;
+     if (!user) return;
 
     const q = query(
       collection(db, "studySessions"),
@@ -112,7 +112,7 @@ useEffect(() => {
 
   // ---------------------- LOAD NOTES ----------------------
   useEffect(() => {
-    if (!user) return <div>Loading user...</div>;
+     if (!user) return;
 
     const ref = doc(db, "studyNotes", user.uid);
 
@@ -231,7 +231,10 @@ useEffect(() => {
     };
 
   
-  if (loading) return <div>Loading data...</div>;
+    if (!user || loading) {
+  return <Loader />;
+}
+
 
 <h1 style={{ color: "red" }}>Dashboard Loaded</h1>
 

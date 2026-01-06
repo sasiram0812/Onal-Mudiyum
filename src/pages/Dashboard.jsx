@@ -5,11 +5,12 @@ import StudyChart from "../components/StudyChart";
 
 import { db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import Loader from "../components/Loader";
+//import Loader from "../components/Loader";
 import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
 
   // ---------------- STATE ----------------
   const [username, setUsername] = useState("User");
@@ -19,17 +20,20 @@ function Dashboard() {
   const [stepsToday, setStepsToday] = useState(0);
   const [moodToday, setMoodToday] = useState("😊");
   const [upcoming, setUpcoming] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
+  const [pageLoading, setPageLoading] = useState(true);
+
+useEffect(() => {
+  if (!user) return;
+
   const fetchData = async () => {
-    if (!user) return <div>Loading user...</div>;
+    setPageLoading(true);
 
     await loadProfile();
     await loadTasks();
     await loadStudy();
     await loadFitness();
 
-    setLoading(false);
+    setPageLoading(false);
   };
 
   fetchData();
@@ -153,7 +157,10 @@ function Dashboard() {
   
 
 
-if (loading) return <div>Loading data...</div>;
+if (loading || pageLoading) {
+  return <div>Loading Dashboard...</div>;
+}
+
 <h1 style={{ color: "red" }}>Dashboard Loaded</h1>
 
   return (

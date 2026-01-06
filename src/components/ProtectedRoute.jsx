@@ -5,9 +5,8 @@ import Loader from "./Loader";
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return <Loader />;
-
-  if (!user) return <Navigate to="/login" replace />;
+  if (loading) return <Loader />; // 🔥 wait for auth
+  if (!user) return <Navigate to="/login" />;
 
   return children;
 };
