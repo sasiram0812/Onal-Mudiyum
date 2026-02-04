@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import "./Study.css";
 import StudyChart from "../components/StudyChart";
-
 import Loader from "../components/Loader";
 
-
-import { auth, db } from "../firebase";
+// UPDATED IMPORTS
+import { db } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import {
   collection,
   addDoc,
@@ -35,22 +35,11 @@ function Study() {
 
   const [studyHours, setStudyHours] = useState(0);
   
-
   const dailyGoal = 7200;
-  const user = auth.currentUser;
-
-  const [loading, setLoading] = useState(true);
-
-useEffect(() => {
-  const fetchData = async () => {
-    // if you have any function like loadStudyData() use it
-      await new Promise(r => setTimeout(r, 300));
-    setLoading(false);  
-  };
-
-  fetchData();
-}, []);
-
+  
+  // UPDATED: Use AuthContext instead of auth.currentUser
+  const { user } = useAuth();
+  const [pageLoading, setPageLoading] = useState(true);
 
   // ---------------------- TIMER LOGIC ----------------------
   useEffect(() => {
@@ -123,6 +112,7 @@ useEffect(() => {
 
   // ---------------------- ADD SUBJECT ----------------------
   const addSubject = async () => {
+    if (!user) return alert("Please log in first"); // ADDED CHECK
     if (!newSubject.trim()) return alert("Subject name cannot be empty");
 
     await addDoc(collection(db, "subjects"), {
@@ -135,6 +125,7 @@ useEffect(() => {
 
   // ---------------------- DELETE SUBJECT ----------------------
   const deleteSubject = async (name) => {
+    if (!user) return; // ADDED CHECK
     const subjectToDelete = subjects.find((s) => s.name === name);
     if (!subjectToDelete) return;
 
@@ -147,6 +138,7 @@ useEffect(() => {
 
   // ---------------------- SAVE STUDY SESSION ----------------------
   const saveSession = async () => {
+    if (!user) return alert("Please log in first"); // ADDED CHECK
     if (timer === 0) return;
 
     await addDoc(collection(db, "studySessions"), {
@@ -163,6 +155,7 @@ useEffect(() => {
 
   // ---------------------- SAVE NOTES ----------------------
   const saveNotes = async () => {
+    if (!user) return alert("Please log in first"); // ADDED CHECK
     await setDoc(doc(db, "studyNotes", user.uid), {
       text: notes,
     });
@@ -186,57 +179,66 @@ useEffect(() => {
   });
 
   // ---------------- LOAD STUDY SESSIONS ----------------
-    const loadStudy = async () => {
-      const ref = collection(db, "studySessions");
-      const snap = await getDocs(query(ref, where("userId", "==", user.uid)));
-  
-      let totalSecondsToday = 0;
-  
-      // weekly array
-      const mapDaily = {
-        Mon: 0, Tue: 0, Wed: 0, Thu: 0,
-        Fri: 0, Sat: 0, Sun: 0,
-      };
-  
-      snap.forEach((doc) => {
-        const s = doc.data();
-  
-        // today
-        if (s.date === new Date().toDateString()) {
-          totalSecondsToday += s.rawSeconds;
-        }
-  
-        // weekly
-        const day = new Date(s.date).toString().slice(0, 3);
-        if (mapDaily[day] !== undefined) {
-          mapDaily[day] += s.rawSeconds / 3600; // convert to hours
-        }
-      });
-  
-      setStudyHours((totalSecondsToday / 3600).toFixed(1));
-  
-      setWeeklyData({
-        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        studyHours: [
-          mapDaily.Mon,
-          mapDaily.Tue,
-          mapDaily.Wed,
-          mapDaily.Thu,
-          mapDaily.Fri,
-          mapDaily.Sat,
-          mapDaily.Sun,
-        ],
-        goals: [2, 2, 2, 2, 2, 2, 2],
-      });
+  const loadStudy = async () => {
+    const ref = collection(db, "studySessions");
+    const snap = await getDocs(query(ref, where("userId", "==", user.uid)));
+
+    let totalSecondsToday = 0;
+
+    // weekly array
+    const mapDaily = {
+      Mon: 0, Tue: 0, Wed: 0, Thu: 0,
+      Fri: 0, Sat: 0, Sun: 0,
     };
 
-  
-    if (!user || loading) {
-  return <Loader />;
-}
+    snap.forEach((doc) => {
+      const s = doc.data();
 
+      // today
+      if (s.date === new Date().toDateString()) {
+        totalSecondsToday += s.rawSeconds;
+      }
 
-<h1 style={{ color: "red" }}>Dashboard Loaded</h1>
+      // weekly
+      const day = new Date(s.date).toString().slice(0, 3);
+      if (mapDaily[day] !== undefined) {
+        mapDaily[day] += s.rawSeconds / 3600; // convert to hours
+      }
+    });
+
+    setStudyHours((totalSecondsToday / 3600).toFixed(1));
+
+    setWeeklyData({
+      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      studyHours: [
+        mapDaily.Mon,
+        mapDaily.Tue,
+        mapDaily.Wed,
+        mapDaily.Thu,
+        mapDaily.Fri,
+        mapDaily.Sat,
+        mapDaily.Sun,
+      ],
+      goals: [2, 2, 2, 2, 2, 2, 2],
+    });
+  };
+
+  // UPDATED: Load study data when user is available
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchStudyData = async () => {
+      setPageLoading(true);
+      await loadStudy();
+      setPageLoading(false);
+    };
+    
+    fetchStudyData();
+  }, [user]);
+
+  if (!user || pageLoading) {
+    return <Loader />;
+  }
 
   return (
     <div className="study-container">
@@ -363,7 +365,7 @@ useEffect(() => {
 
       <footer className="study-footer">
         © 2025 Unnal Mudiyum — Study Better Every Day
-                <h1></h1>
+        <h1></h1>
         Created by SASIRAM V
       </footer>
     </div>

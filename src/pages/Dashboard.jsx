@@ -5,12 +5,10 @@ import StudyChart from "../components/StudyChart";
 
 import { db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
-//import Loader from "../components/Loader";
 import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
   const { user, loading } = useAuth();
-
 
   // ---------------- STATE ----------------
   const [username, setUsername] = useState("User");
@@ -22,51 +20,28 @@ function Dashboard() {
   const [upcoming, setUpcoming] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
 
-useEffect(() => {
-  if (!user) return;
-
-  const fetchData = async () => {
-    setPageLoading(true);
-
-    await loadProfile();
-    await loadTasks();
-    await loadStudy();
-    await loadFitness();
-
-    setPageLoading(false);
-  };
-
-  fetchData();
-}, [user]);
-
-
-
   const [weeklyData, setWeeklyData] = useState({
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     studyHours: [0, 0, 0, 0, 0, 0, 0],
-    goals: [2, 2, 2, 2, 2, 2, 2], // 2 hrs every day
+    goals: [2, 2, 2, 2, 2, 2, 2],
   });
 
-  // ---------------- LOAD PROFILE ----------------
+  // ---------------- LOAD FUNCTIONS (keep as is) ----------------
   const loadProfile = async () => {
     const ref = collection(db, "users");
     const snap = await getDocs(query(ref, where("email", "==", user.email)));
-
     snap.forEach((doc) => {
       const d = doc.data();
       setUsername(d.name || "User");
     });
   };
 
-  // ---------------- LOAD TASKS ----------------
   const loadTasks = async () => {
     const ref = collection(db, "tasks");
     const snap = await getDocs(query(ref, where("userId", "==", user.uid)));
-
     let done = 0;
     let total = 0;
     const upcomingList = [];
-
     snap.forEach((doc) => {
       const t = doc.data();
       total++;
@@ -79,66 +54,46 @@ useEffect(() => {
         });
       }
     });
-
     setTasksDone(done);
     setTasksTotal(total);
     setUpcoming(upcomingList.slice(0, 4));
   };
 
-  // ---------------- LOAD STUDY SESSIONS ----------------
   const loadStudy = async () => {
     const ref = collection(db, "studySessions");
     const snap = await getDocs(query(ref, where("userId", "==", user.uid)));
-
     let totalSecondsToday = 0;
-
-    // weekly array
     const mapDaily = {
       Mon: 0, Tue: 0, Wed: 0, Thu: 0,
       Fri: 0, Sat: 0, Sun: 0,
     };
-
     snap.forEach((doc) => {
       const s = doc.data();
-
-      // today
       if (s.date === new Date().toDateString()) {
         totalSecondsToday += s.rawSeconds;
       }
-
-      // weekly
       const day = new Date(s.date).toString().slice(0, 3);
       if (mapDaily[day] !== undefined) {
-        mapDaily[day] += s.rawSeconds / 3600; // convert to hours
+        mapDaily[day] += s.rawSeconds / 3600;
       }
     });
-
     setStudyHours((totalSecondsToday / 3600).toFixed(1));
-
     setWeeklyData({
       labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       studyHours: [
-        mapDaily.Mon,
-        mapDaily.Tue,
-        mapDaily.Wed,
-        mapDaily.Thu,
-        mapDaily.Fri,
-        mapDaily.Sat,
-        mapDaily.Sun,
+        mapDaily.Mon, mapDaily.Tue, mapDaily.Wed,
+        mapDaily.Thu, mapDaily.Fri, mapDaily.Sat, mapDaily.Sun,
       ],
       goals: [2, 2, 2, 2, 2, 2, 2],
     });
   };
 
-  // ---------------- LOAD FITNESS DATA ----------------
   const loadFitness = async () => {
     const today = new Date().toDateString();
-
     const ref = collection(db, "fitnessDaily");
     const snap = await getDocs(
       query(ref, where("userId", "==", user.uid), where("date", "==", today))
     );
-
     snap.forEach((doc) => {
       const f = doc.data();
       setStepsToday(f.steps || 0);
@@ -146,93 +101,83 @@ useEffect(() => {
     });
   };
 
-  // ---------------- INITIAL LOAD ----------------
+  // ---------------- SINGLE useEffect ----------------
   useEffect(() => {
-    if (!user) return <div>Loading user...</div>;
-    loadProfile();
-    loadTasks();
-    loadStudy();
-    loadFitness();
-  }, [user]);
-  
-
-
-if (loading || pageLoading) {
-  return <div>Loading Dashboard...</div>;
-}
-
-<h1 style={{ color: "red" }}>Dashboard Loaded</h1>
-
-  return (
+    if (!user) return;
     
+    const fetchAll = async () => {
+      setPageLoading(true);
+      await loadProfile();
+      await loadTasks();
+      await loadStudy();
+      await loadFitness();
+      setPageLoading(false);
+    };
+    
+    fetchAll();
+  }, [user]);
+
+  // ---------------- LOADING CHECK ----------------
+  if (loading || pageLoading) {
+    return <div>Loading Dashboard...</div>;
+  }
+
+  // ---------------- UI (keep everything below exactly as is) ----------------
+  return (
     <div className="dashboard-container">
       <Navbar />
-
       <div className="dashboard-wrapper fade-in">
-
         {/* WELCOME SECTION */}
         <div className="welcome-section slide-up">
           <h1>Hello, {username} 👋</h1>
-          <p className="subtext">Here’s your personalized daily report.</p>
+          <p className="subtext">Here's your personalized daily report.</p>
         </div>
 
         {/* TOP CARDS */}
         <div className="overview-grid">
-
           <div className="overview-card pop">
             <h4>📘 Study Hours</h4>
             <h2>{studyHours} hrs</h2>
             <p className="sub">Today</p>
           </div>
-
           <div className="overview-card pop">
             <h4>📝 Tasks Completed</h4>
             <h2>{tasksDone}/{tasksTotal}</h2>
             <p className="sub">This week</p>
           </div>
-
           <div className="overview-card pop">
             <h4>🏃 Steps</h4>
             <h2>{stepsToday}</h2>
             <p className="sub">Today</p>
           </div>
-
           <div className="overview-card pop">
             <h4>😊 Mood</h4>
             <h2>{moodToday}</h2>
             <p className="sub">Right now</p>
           </div>
-
         </div>
 
         {/* CHART + UPCOMING */}
         <div className="chart-grid">
-
           <div className="chart-card fade-in">
             <h3>Weekly Study Progress</h3>
             <StudyChart weeklyData={weeklyData} />
           </div>
-
           <div className="upcoming-card slide-left">
             <h3>Upcoming Tasks</h3>
-
             {upcoming.length === 0 && (
               <p className="sub">No upcoming tasks 🎉</p>
             )}
-
             {upcoming.map((item) => (
               <div key={item.id} className="upcoming-item">
                 <div>
                   <h4>{item.title}</h4>
                   <p className="sub">{item.when}</p>
                 </div>
-
                 <button className="done-btn">✔</button>
               </div>
             ))}
-
           </div>
-
         </div>
 
         {/* QUICK ACTIONS */}
@@ -247,16 +192,13 @@ if (loading || pageLoading) {
         {/* TODAY SCHEDULE */}
         <div className="schedule-card pop">
           <h3>Today's Schedule</h3>
-
           <h1>...</h1>
-
-          
         </div>
 
         <footer className="footer">
           © 2025 Unnal Mudiyum — Dashboard
-                  <h1></h1>
-        Created by SASIRAM V
+          <h1></h1>
+          Created by SASIRAM V
         </footer>
       </div>
     </div>

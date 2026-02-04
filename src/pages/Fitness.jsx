@@ -4,7 +4,9 @@ import "./Fitness.css";
 import StudyChart from "../components/StudyChart";
 import Loader from "../components/Loader";
 
-import { auth, db } from "../firebase";
+// UPDATED IMPORTS
+import { db } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import {
   collection,
   addDoc,
@@ -16,8 +18,9 @@ import {
 } from "firebase/firestore";
 
 function Fitness() {
-  const user = auth.currentUser;
-
+  // UPDATED: Use AuthContext instead of auth.currentUser
+  const { user } = useAuth();
+  
   const todayDate = new Date().toDateString();
 
   const [steps, setSteps] = useState("");
@@ -32,20 +35,9 @@ function Fitness() {
   const [workouts, setWorkouts] = useState([]);
 
   const stepGoal = 8000;
-
-  const [loading, setLoading] = useState(true);
-
-useEffect(() => {
-  const fetchData = async () => {
-    // TODO page does not load DB now, so just wait 300ms
-    await new Promise(r => setTimeout(r, 300));
-    setLoading(false);
-  };
-
-  fetchData();
-}, []);
-
   
+  // UPDATED: Renamed to pageLoading for consistency
+  const [pageLoading, setPageLoading] = useState(true);
 
   // -------------------------------------------------------------
   // LOAD DAILY FITNESS DATA
@@ -85,10 +77,24 @@ useEffect(() => {
     });
   }, [user]);
 
+  // ADDED: Set loading to false when user data is available
+  useEffect(() => {
+    if (user) {
+      const timer = setTimeout(() => {
+        setPageLoading(false);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
+
   // -------------------------------------------------------------
   // SAVE DAILY FITNESS DATA
   // -------------------------------------------------------------
   const saveDailyFitness = async (field, value) => {
+    // ADDED: User check
+    if (!user) return alert("Please log in first");
+    
     await setDoc(
       doc(db, "fitnessDaily", `${user.uid}_${todayDate}`),
       {
@@ -110,6 +116,8 @@ useEffect(() => {
   // ADD WORKOUT
   // -------------------------------------------------------------
   const addWorkout = async () => {
+    // ADDED: User check
+    if (!user) return alert("Please log in first");
     if (!workoutInput.trim() || !workoutTime.trim()) return;
 
     const calories = Math.floor(workoutTime * 7);
@@ -157,12 +165,9 @@ useEffect(() => {
     goals: [8000, 8000, 8000, 8000, 8000, 8000, 8000],
   };
 
-   if (!user || loading) {
-  return <Loader />;
-}
-
-
-<h1 style={{ color: "red" }}>Dashboard Loaded</h1>
+  if (!user || pageLoading) {
+    return <Loader />;
+  }
 
   return (
     <div className="fitness-container">
@@ -342,7 +347,7 @@ useEffect(() => {
 
       <footer className="footer">
         © 2025 Unnal Mudiyum — Stay Healthy, Stay Sharp
-                <h1></h1>
+        <h1></h1>
         Created by SASIRAM V
       </footer>
     </div>
