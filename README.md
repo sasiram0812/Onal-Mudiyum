@@ -1,70 +1,114 @@
-# Getting Started with Create React App
+# 🚀 Onal Mudiyum – Smart Student Productivity App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern **full-stack productivity web app** designed for students to manage their daily life efficiently — including **study tracking, task management, fitness monitoring, and AI-based suggestions**.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🌐 Live Demo
 
-### `npm start`
+🔗 https://unnalmudiyum.netlify.app/
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## ✨ Features
 
-### `npm test`
+* 📘 Study Tracker (timer + sessions + weekly chart)
+* 📝 To-Do Task Manager (add, complete, delete tasks)
+* 🏃 Fitness Tracker (steps, sleep, mood tracking)
+* 📊 Dashboard Insights (daily analytics & overview)
+* 🧠 AI Suggestions (smart personalized tips)
+* 🔐 Authentication (Signup/Login using Firebase)
+* ⚡ Real-time database updates (Firestore)
+* 🎨 Clean UI with animations
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🛠️ Tech Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* **Frontend:** React.js, CSS
+* **Backend/Database:** Firebase (Firestore)
+* **Authentication:** Firebase Auth
+* **Charts:** Chart.js
+* **Deployment:** Netlify
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 📂 Project Structure
 
-### `npm run eject`
+```
+src/
+ ├── components/
+ ├── pages/
+ ├── context/
+ ├── firebase.js
+ ├── App.js
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## ⚙️ Setup & Installation
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. Clone the repository
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+git clone https://github.com/your-username/onal-mudiyum.git
+```
 
-## Learn More
+2. Install dependencies
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm install
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. Start the app
 
-### Code Splitting
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## 🔑 Environment Variables
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Create a `.env` file and add:
 
-### Making a Progressive Web App
+```
+REACT_APP_FIREBASE_API_KEY=your_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_domain
+REACT_APP_FIREBASE_PROJECT_ID=your_project
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_bucket
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🚀 Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Deployed using **Netlify**
 
-### Deployment
+* Connect GitHub repo
+* Build command: `npm run build`
+* Publish directory: `build`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## 📌 Future Improvements
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+* 🤖 Real AI integration (OpenAI / ML)
+* 📈 Advanced analytics dashboard
+* 📱 Mobile responsive improvements
+* 🔔 Notifications & reminders
+
+---
+
+## 👨‍💻 Author
+
+**Sasiram V**
+Aspiring Full Stack Developer 🚀
+
+---
+
+## ⭐ Support
+
+If you like this project, give it a ⭐ on GitHub!
